@@ -85,6 +85,9 @@ STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media') # Absolute path to the media directory
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '5o^0n=45f*@&k^b!4+b*f#!ib*e9a!^*uswv0pp8idqcq(h%vp'
 

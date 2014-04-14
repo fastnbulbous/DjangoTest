@@ -1,3 +1,6 @@
+# At the top of your urls.py file, add the following line:
+from django.conf import settings
+
 from django.conf.urls import patterns, include, url
 
 # Uncomment the next two lines to enable the admin:
@@ -17,3 +20,11 @@ urlpatterns = patterns('',
 	url(r'^rango/', include('rango.urls')), # ADD THIS NEW TUPLE!
 	url(r'^articles/(\d{4})/$', include('rango.urls')), # ADD THIS NEW TUPLE!
 )
+
+# UNDERNEATH your urlpatterns definition, add the following two lines:
+if settings.DEBUG:
+    urlpatterns += patterns(
+        'django.views.static',
+        (r'media/(?P<path>.*)',
+        'serve',
+        {'document_root': settings.MEDIA_ROOT}), )

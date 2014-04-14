@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+{% load static %} <!-- New line -->
+
 <html>
 
     <head>
@@ -9,6 +12,8 @@
         <h1>Rango says...</h1>
         hello world! <strong>{{ boldmessage }}</strong><br />
         <a href="/rango/about/">About</a><br />
+        <img src="{% static "ringupingu.png" %}" alt="Picture of Rango" /> <!-- New line -->
+		<iframe class="imgur-album" width="100%" height="800" frameborder="0" src="http://imgur.com/a/2xTut/embed"></iframe>
     </body>
 
 </html>

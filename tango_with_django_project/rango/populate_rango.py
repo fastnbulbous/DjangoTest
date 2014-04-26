@@ -109,15 +109,67 @@ def add_player(name, team):
 
 
 
+def find_files(directory, pattern):
+    for root, dirs, files in os.walk(directory):
+        for basename in files:
+            if fnmatch.fnmatch(basename, pattern):
+                filename = os.path.join(root, basename)
+                yield filename
+
+def populate_cards_from_pickle():
+    fileStart = "H:\\Code\\beckett\\tutorial\\Basketball"
+
+    matches = []
+    for filename in find_files("H:\\Code\\beckett\\tutorial\\Basketball", '*.pickle'):
+        matches.append(filename)
+        print filename
+
+    #print file
+
+    for match in matches:
+        file = open(match, 'r')
+        beckettItems = (pickle.load(file))
+
+        for item in beckettItems:
+            try:
+                print "Set: " + ''.join(item['setName']) + " - Players " + ''.join(item['playerNames'])
+                for player in item['playerNames']:
+                    add_team(item['team'], basketBall())
+                    add_player(player, item['team'])
+            except:
+                print "Noting"
+
+        file.close()
+                
+# Start execution here!
+if __name__ == '__main__':
+    
+    for path in sys.path:
+        print path
+    
+
+
+
 # Start execution here!
 if __name__ == '__main__':
     sys.path.append('H:\\Code\\DjangoTest\\tango_with_django_project\\rango')
     sys.path.append('H:\\Code\\DjangoTest\\tango_with_django_project')
+    sys.path.append('H:\\Code\\beckett\\')
     
     for path in sys.path:
         print path
+    
+    from tutorial.items import BeckettItem
+    import pickle
+    import pprint
+    import sys
+
+    import os, fnmatch
     
     print "Starting Rango population script..."
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tango_with_django_project.settings')
     from rango.models import Category, Page, Team, Sport, Player
     populate_cards()
+    populate_cards_from_pickle()
+    
+    

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rango</title>
+    </head>
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rango</title>
+    </head>
+
+    <body>
+        <h1>{{ sport_name }}</h1>
+        {% if sport %}
+            {% if teams %}
+            <ul>
+                {% for team in teams %}
+                <li><a href="{{ team.name }}">{{ team.name }}</a></li>
+                {% endfor %}
+            </ul>
+            {% else %}
+                <strong>No pages currently in sport.</strong>
+            {% endif %}
+        {% else %}
+            The specified sport {{ sport_name }} does not exist!
+        {% endif %}
+    </body>
+</html>
+</html>

@@ -9,8 +9,46 @@
     </head>
 
     <body>
-        <h1>Rango says...</h1>
+        <h1>Saya Rango nomong...</h1>
         hello world! <strong>{{ boldmessage }}</strong><br />
+        
+        <b> Sports </b>
+        
+        {% if sports %}
+            <ul>
+                {% for sport in sports %}
+                <!-- Following line changed to add an HTML hyperlink -->
+                <li><a href="/rango/sport/{{ sport.category }}">{{ sport.category }}</a></li>
+                {% endfor %}
+            </ul>
+       {% else %}
+            <strong>There are no categories present.</strong>
+       {% endif %}
+        
+        <b> Players </b>        
+        
+         {% if players %}
+            <ul>
+                {% for player in players %}
+                <li>{{ player.name }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <strong>There are no players present.</strong>
+        {% endif %}
+        
+        <b> Teams </b>
+        
+        {% if teams %}
+            <ul>
+                {% for team in teams %}
+                <li>{{ team.name }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <strong>There are no teams present.</strong>
+        {% endif %}
+        
         <a href="/rango/about/">About</a><br />
         <img src="{% static "ringupingu.png" %}" alt="Picture of Rango" /> <!-- New line -->
 		<iframe class="imgur-album" width="100%" height="800" frameborder="0" src="http://imgur.com/a/2xTut/embed"></iframe>

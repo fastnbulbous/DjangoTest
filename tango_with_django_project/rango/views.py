@@ -1,7 +1,7 @@
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
-from rango.models import Sport, Team, Player
+from rango.models import Sport, Team, Player, Card, Set
 
 def index(request):
     # Request the context of the request.
@@ -22,11 +22,17 @@ def index(request):
     for sport in sport_list:
         sport.url = sport.category.replace(' ', '_')
     
-    player_list = Player.objects.all()
-    team_list = Team.objects.all()
+    player_list = Player.objects.all().order_by('name')
+    team_list = Team.objects.all().order_by('name')
+    
+    set_list = Set.objects.all().order_by('year', 'name')
+    card_list = Card.objects.all().order_by('beckettURL')
+    
     context_dict = {'players': player_list,
                     'sports' : sport_list,
-                    'teams' : team_list}
+                    'teams' : team_list,
+                    'cards' : card_list,
+                    'sets' : set_list}
     
     
     # Return a rendered response to send to the client.

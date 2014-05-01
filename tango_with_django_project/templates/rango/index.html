@@ -22,8 +22,23 @@
                 {% endfor %}
             </ul>
        {% else %}
-            <strong>There are no categories present.</strong>
+            <strong>There are no sports present.</strong>
        {% endif %}
+        
+        <b> Sets </b>
+        
+        {% if sets %}
+            <ul>
+                {% for set in sets %}
+                <!-- Following line changed to add an HTML hyperlink -->
+                <li><a href="{{ set.becketURL }}">{{ set.beckettURL }}</a></li>
+                {% endfor %}
+            </ul>
+       {% else %}
+            <strong>There are no sets present.</strong>
+       {% endif %}
+        
+        
         
         <b> Players </b>        
         

@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, gc
 
 def populate():
     python_cat = add_cat('Python')
@@ -105,10 +105,21 @@ def add_player(name, team):
     #player = Player(name=name)
     #player.save()
     player.team.add(team)
+    player.save()
     return player
 
-
-
+def add_set(year, name):
+    setNameWithHyphons = str(name).replace(" ", "-").strip()
+    beckettURL = "http://www.beckett.com/basketball/{year}/{setNameWithHyphons}".format(year=year, setNameWithHyphons=setNameWithHyphons)
+    #print "adding set:" + year + " " + name + " " + beckettURL + " " + setNameWithHyphons
+    set = Set.objects.get_or_create(year=year, name=name, beckettURL=beckettURL)[0]
+    return set
+    
+def add_card(set, maxSerialNumber, cardNumber, isAutograph,  isMemorabilia, isRookieCard, beckettURL, imageURL  ):
+    card = Card.objects.get_or_create(set=set, maxSerialNumber=maxSerialNumber, cardNumber=cardNumber, isAutograph=isAutograph,  isMemorabilia= isMemorabilia, isRookieCard=isRookieCard, beckettURL=beckettURL, imageURL=imageURL)[0]
+    card.save()
+    return card    
+    
 def find_files(directory, pattern):
     for root, dirs, files in os.walk(directory):
         for basename in files:
@@ -122,32 +133,55 @@ def populate_cards_from_pickle():
     matches = []
     for filename in find_files("H:\\Code\\beckett\\tutorial\\Basketball", '*.pickle'):
         matches.append(filename)
-        print filename
 
     #print file
 
     for match in matches:
-        file = open(match, 'r')
-        beckettItems = (pickle.load(file))
-
-        for item in beckettItems:
-            try:
-                print "Set: " + ''.join(item['setName']) + " - Players " + ''.join(item['playerNames'])
-                for player in item['playerNames']:
-                    add_team(item['team'], basketBall())
-                    add_player(player, item['team'])
-            except:
-                print "Noting"
-
-        file.close()
+        with open(match, 'r') as file:
+            beckettItems = (pickle.load(file))
+        
+            print "File" + str(file)
+        
+            for item in beckettItems:
                 
-# Start execution here!
-if __name__ == '__main__':
-    
-    for path in sys.path:
-        print path
-    
+                if item is not None:            
+                    
+                    
+                    team = add_team(item['team'], basketBall())
+                    
+                    set = add_set(item['year'], item['setName'])
+                    
+                    isMerobilia = isAutograph = isRookieCard = False
+                    
+                    try:
+                        isMerobilia = item['memorabilia'] > 0
+                    except:
+                        i = 2
+                    
+                    try:
+                        isAutograph = item['autograph'] > 0
+                    except:
+                        i = 2
+                        
+                    try:
+                        isRookieCard = item['rookiecard'] > 0
+                    except:
+                        i = 2    
 
+                    maxSerialNumber = 0;
+                    
+                    try:
+                        maxSerialNumber = item['maxSerialNumber']
+                    except:
+                        i =2
+                    
+                    card = add_card(set, maxSerialNumber, item['cardNumber'], isAutograph, isMerobilia, isRookieCard, item['beckettLink'], item['imageLink'])
+                    
+                    for playerName in item['playerNames']:
+                        player = add_player(playerName, team)
+                        card.players.add(player)
+                        
+        gc.collect()
 
 
 # Start execution here!
@@ -160,7 +194,7 @@ if __name__ == '__main__':
         print path
     
     from tutorial.items import BeckettItem
-    import pickle
+    import cPickle as pickle
     import pprint
     import sys
 
@@ -168,7 +202,7 @@ if __name__ == '__main__':
     
     print "Starting Rango population script..."
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tango_with_django_project.settings')
-    from rango.models import Category, Page, Team, Sport, Player
+    from rango.models import Category, Page, Team, Sport, Player, Set, Card
     populate_cards()
     populate_cards_from_pickle()
     

@@ -18,7 +18,7 @@
             <ul>
                 {% for sport in sports %}
                 <!-- Following line changed to add an HTML hyperlink -->
-                <li><a href="/rango/sport/{{ sport.category }}">{{ sport.category }}</a></li>
+                <li><a href="{{ sport.url }}">{{ sport.category }}</a></li>
                 {% endfor %}
             </ul>
        {% else %}
@@ -31,7 +31,7 @@
             <ul>
                 {% for set in sets %}
                 <!-- Following line changed to add an HTML hyperlink -->
-                <li><a href="{{ set.becketURL }}">{{ set.beckettURL }}</a></li>
+                <li><a href="{{ set.url }}">{{ set.beckettURL }}</a></li>
                 {% endfor %}
             </ul>
        {% else %}

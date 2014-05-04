@@ -1,0 +1,17 @@
+
+www.cardtracker.com/{sport}/
+eg:
+www.cardtracker.com/basketball/
+
+year
+teams
+
+www.cardtracker.com/{sport}/{year}
+www.cardtracker.com/basketball/1997_98
+
+
+www.cardtracker.com/{sport}/{year}/(set}
+www.cardtracker.com/basketball/1997_98/metal_universe_precious_metal_gems
+
+www.cardtracker.com/{sport}/{year}/(set}/{card}
+www.cardtracker.com/basketball/1997_98/metal_universe_precious_metal_gems/1-charles-barkley-3142592

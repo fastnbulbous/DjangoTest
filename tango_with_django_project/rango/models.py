@@ -65,15 +65,25 @@ class Card(models.Model):
     players = models.ManyToManyField(Player)
     maxSerialNumber = models.PositiveIntegerField()
     cardNumber = models.CharField(max_length=128)
+    subset = models.CharField(max_length=128)
     isAutograph = models.BooleanField(default=False)
     isMemorabilia = models.BooleanField(default=False)
     isRookieCard = models.BooleanField(default=False)
     beckettURL = models.URLField(max_length=500)
     imageURL = models.URLField(max_length=500)
     
+    def playerNames(self):
+        names = ""
+        for player in self.players.all():
+            names += player.name + " "
+        return names;
+    
     def __unicode__(self):
-        return set + " " + player    
+        
+        return str(self.set) + " " + str(self.cardNumber) + " " + self.playerNames()
+  
 
+  
 class CardInstance(models.Model):
     card = models.ForeignKey(Card)
     serialNumber = models.PositiveIntegerField()

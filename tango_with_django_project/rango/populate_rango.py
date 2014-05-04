@@ -115,8 +115,9 @@ def add_set(year, name):
     set = Set.objects.get_or_create(year=year, name=name, beckettURL=beckettURL)[0]
     return set
     
-def add_card(set, maxSerialNumber, cardNumber, isAutograph,  isMemorabilia, isRookieCard, beckettURL, imageURL  ):
-    card = Card.objects.get_or_create(set=set, maxSerialNumber=maxSerialNumber, cardNumber=cardNumber, isAutograph=isAutograph,  isMemorabilia= isMemorabilia, isRookieCard=isRookieCard, beckettURL=beckettURL, imageURL=imageURL)[0]
+def add_card(set, maxSerialNumber, cardNumber, subset, isAutograph,  isMemorabilia, isRookieCard, beckettURL, imageURL  ):
+    #remove unicode crap
+    card = Card.objects.get_or_create(set=set, maxSerialNumber=maxSerialNumber, cardNumber=cardNumber, subset=subset,isAutograph=isAutograph,  isMemorabilia= isMemorabilia, isRookieCard=isRookieCard, beckettURL=beckettURL, imageURL=imageURL)[0]
     card.save()
     return card    
     
@@ -127,62 +128,74 @@ def find_files(directory, pattern):
                 filename = os.path.join(root, basename)
                 yield filename
 
+def populate_from_file(match):
+    with open(match, 'r') as file:
+        beckettItems = (pickle.load(file))
+    
+        print "File" + str(file)
+    
+        for item in beckettItems:
+            if item is not None:            
+                team = add_team(item['team'], basketBall())
+                
+                set = add_set(item['year'], item['setName'])
+                
+                isMerobilia = isAutograph = isRookieCard = False
+                
+                try:
+                    isMerobilia = item['memorabilia'] > 0
+                except:
+                    i = 2
+                
+                try:
+                    isAutograph = item['autograph'] > 0
+                except:
+                    i = 2
+                    
+                try:
+                    isRookieCard = item['rookiecard'] > 0
+                except:
+                    i = 2    
+
+                maxSerialNumber = 0;
+                
+                try:
+                    maxSerialNumber = item['serialNumber']
+                except:
+                    i =2
+                
+                subset = ""
+                try:
+                    subset = item['subsetName']
+                except:
+                    i =2
+                
+                card = add_card(set, maxSerialNumber, item['cardNumber'], subset, isAutograph, isMerobilia, isRookieCard, item['beckettLink'], item['imageLink'])
+                
+                for playerName in item['playerNames']:
+                    player = add_player(playerName, team)
+                    card.players.add(player)
+                """
+                del card
+                del team
+                del player
+                del set
+                    
+        del beckettItems[:]            
+    gc.collect()
+    """
+                
 def populate_cards_from_pickle():
     fileStart = "H:\\Code\\beckett\\tutorial\\Basketball"
 
     matches = []
-    for filename in find_files("H:\\Code\\beckett\\tutorial\\Basketball", '*.pickle'):
+    for filename in find_files("H:\\BeckettScrape\\Basketball", '*.pickle'):
         matches.append(filename)
 
     #print file
 
     for match in matches:
-        with open(match, 'r') as file:
-            beckettItems = (pickle.load(file))
-        
-            print "File" + str(file)
-        
-            for item in beckettItems:
-                
-                if item is not None:            
-                    
-                    
-                    team = add_team(item['team'], basketBall())
-                    
-                    set = add_set(item['year'], item['setName'])
-                    
-                    isMerobilia = isAutograph = isRookieCard = False
-                    
-                    try:
-                        isMerobilia = item['memorabilia'] > 0
-                    except:
-                        i = 2
-                    
-                    try:
-                        isAutograph = item['autograph'] > 0
-                    except:
-                        i = 2
-                        
-                    try:
-                        isRookieCard = item['rookiecard'] > 0
-                    except:
-                        i = 2    
-
-                    maxSerialNumber = 0;
-                    
-                    try:
-                        maxSerialNumber = item['maxSerialNumber']
-                    except:
-                        i =2
-                    
-                    card = add_card(set, maxSerialNumber, item['cardNumber'], isAutograph, isMerobilia, isRookieCard, item['beckettLink'], item['imageLink'])
-                    
-                    for playerName in item['playerNames']:
-                        player = add_player(playerName, team)
-                        card.players.add(player)
-                        
-        gc.collect()
-
+        populate_from_file(match)
 
 # Start execution here!
 if __name__ == '__main__':

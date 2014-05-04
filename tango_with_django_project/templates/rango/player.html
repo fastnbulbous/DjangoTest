@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rango</title>
+    </head>
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rango - cards</title>
+    </head>
+
+    <body>
+        <h1>{{ player_name }}</h1>
+        {% if player %}
+            {% if cards %}
+            <ul>
+                {% for card in cards %}
+                <li><a href="{{ card.url }}">{{ card }}</a> <A href="{{ card.image }}"><img HEIGHT=50 WIDTH=50 SRC="{{ card.image }}"></A></li>
+                {% endfor %}
+            </ul>
+            {% else %}
+                <strong>No cards for this player</strong>
+            {% endif %}
+        {% else %}
+            The specified player {{ player_name }} does not exist!
+        {% endif %}
+    </body>
+</html>
+</html>

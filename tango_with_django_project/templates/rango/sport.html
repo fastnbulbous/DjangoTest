@@ -16,7 +16,7 @@
             {% if teams %}
             <ul>
                 {% for team in teams %}
-                <li><a href="{{ team.name }}">{{ team.name }}</a></li>
+                <li><a href="/{{sport_name}}/{{ team.url }}">{{ team.name }}</a></li>
                 {% endfor %}
             </ul>
             {% else %}

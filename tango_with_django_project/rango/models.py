@@ -92,14 +92,14 @@ class CardInstance(models.Model):
         return str(self.card) + " (" + str(self.serialNumber) + ")"        
 
 class CardInstanceMedia(models.Model):
-    cardInstance = models.ManyToManyField(CardInstance)
+    cardInstance = models.ForeignKey(CardInstance)
     imageURL = models.URLField()
 
     def __unicode__(self):
         return str(self.imageURL) 
 
 class CardInstanceSales(models.Model):
-    cardInstance = models.ManyToManyField(CardInstance) #probably should be foriegn key ajar
+    cardInstance = models.ForeignKey(CardInstance)
     ebayNumber = models.CharField(max_length=128)
     otherURL = models.URLField()
     saleDate = models.DateField()

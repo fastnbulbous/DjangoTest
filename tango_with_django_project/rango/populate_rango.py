@@ -180,10 +180,11 @@ def populate_from_file(match):
 
                 
 def populate_cards_from_pickle():
-    fileStart = "H:\\Code\\beckett\\tutorial\\Basketball"
+
+    fileStart = "H:\\Code\\TempBeckett"
 
     matches = []
-    for filename in find_files("H:\\BeckettScrape\\Basketball", '*.pickle'):
+    for filename in find_files(fileStart, '*.pickle'):
         matches.append(filename)
 
     #print file
@@ -210,15 +211,13 @@ def addEbaySaleInstance(CardInstance, ItemID):
     today_date = datetime.date.today()
     placeHolderURL = "http://i.ebayimg.com/00/s/MTQ4OFg5NTQ=/z/DdQAAMXQeW5Tbuyw/$_57.JPG"
 
-    cardInstanceSales = CardInstanceSales.objects.get_or_create(ebayNumber=ItemID, otherURL=placeHolderURL, saleDate=today_date, saleAmount="100.0", evidenceImageURL=placeHolderURL)[0]
+    cardInstanceSales = CardInstanceSales.objects.get_or_create(cardInstance=CardInstance, ebayNumber=ItemID, otherURL=placeHolderURL, saleDate=today_date, saleAmount="100.0", evidenceImageURL=placeHolderURL)[0]
     cardInstanceSales.save()
-    cardInstanceSales.cardInstance.add(CardInstance)
     return cardInstanceSales
 
 def addCardInstanceMedia(CardInstance, imageURL):
-    cardInstanceMedia = CardInstanceMedia.objects.get_or_create(imageURL=imageURL)[0]
+    cardInstanceMedia = CardInstanceMedia.objects.get_or_create(cardInstance=CardInstance, imageURL=imageURL)[0]
     cardInstanceMedia.save()
-    cardInstanceMedia.cardInstance.add(CardInstance)
     return cardInstanceMedia
 
 def addCardInstance(Card, ItemID):
@@ -318,7 +317,7 @@ if __name__ == '__main__':
     print "Starting Rango population script..."
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tango_with_django_project.settings')
     from rango.models import Category, Page, Team, Sport, Player, Set, Card, CardInstance, CardInstanceMedia, CardInstanceSales
-    #populate_cards()
-    #populate_cards_from_pickle()
+    populate_cards()
+    populate_cards_from_pickle()
     addStarRubies()
     

@@ -76,7 +76,7 @@ class Card(models.Model):
         names = ""
         for player in self.players.all():
             names += player.name + " "
-        return names;
+        return names.strip();
     
     def __unicode__(self):
         
@@ -89,17 +89,23 @@ class CardInstance(models.Model):
     serialNumber = models.PositiveIntegerField()
     
     def __unicode__(self):
-        return card + " (" + str(serialNumber) + ")"        
+        return str(self.card) + " (" + str(self.serialNumber) + ")"        
 
 class CardInstanceMedia(models.Model):
     cardInstance = models.ManyToManyField(CardInstance)
     imageURL = models.URLField()
 
+    def __unicode__(self):
+        return str(self.imageURL) 
+
 class CardInstanceSales(models.Model):
-    cardInstance = models.ManyToManyField(CardInstance)
+    cardInstance = models.ManyToManyField(CardInstance) #probably should be foriegn key ajar
     ebayNumber = models.CharField(max_length=128)
     otherURL = models.URLField()
     saleDate = models.DateField()
     saleAmount = models.FloatField()
     evidenceImageURL = models.URLField()
+
+    def __unicode__(self):
+        return " - " + str(self.ebayNumber)
     

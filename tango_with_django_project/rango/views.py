@@ -3,13 +3,14 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from rango.models import Sport, Team, Player, Card, Set
 
-
 def index(request):
+
+    
+
     # Request the context of the request.
     # The context contains information such as the client's machine details, for example.
     context = RequestContext(request)
-
-
+    
     
     # Construct a dictionary to pass to the template engine as its context.
     # Note the key boldmessage is the same as {{ boldmessage }} in the template!

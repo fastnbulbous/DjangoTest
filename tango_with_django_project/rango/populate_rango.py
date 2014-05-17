@@ -1,4 +1,6 @@
 import os, sys, gc
+import logging
+logging.basicConfig(filename='populateDBFromEbay.log',level=logging.DEBUG)
 
 def populate():
     python_cat = add_cat('Python')
@@ -175,15 +177,7 @@ def populate_from_file(match):
                 for playerName in item['playerNames']:
                     player = add_player(playerName, team)
                     card.players.add(player)
-                """
-                del card
-                del team
-                del player
-                del set
-                    
-        del beckettItems[:]            
-    gc.collect()
-    """
+
                 
 def populate_cards_from_pickle():
     fileStart = "H:\\Code\\beckett\\tutorial\\Basketball"
@@ -196,6 +190,114 @@ def populate_cards_from_pickle():
 
     for match in matches:
         populate_from_file(match)
+
+def stripPictureURL(pictureURL):
+    # we normally get a URL from the picture gallery of completed items like: 
+    # http://i.ebayimg.com/00/s/MTQ4OFg5NTQ=/z/DdQAAMXQeW5Tbuyw/$_1.JPG?set_id=880000500F we need to strip off the 
+    # ? crap and also replace _1 with _57 which is the largest image
+    # ie -> http://i.ebayimg.com/00/s/MTQ4OFg5NTQ=/z/DdQAAMXQeW5Tbuyw/$_57.JPG
+
+    #Split the string at the first occurrence of sep, and return a 3-tuple containing the part before the separator, 
+    #the separator itself, and the part after the separator. 
+    #If the separator is not found, return a 3-tuple containing the string itself, followed by two empty strings.
+    stripURL = pictureURL.partition('_1')[0]
+    stripURL += "_57.jpg"
+    return stripURL
+
+def addEbaySaleInstance(CardInstance, ItemID):
+    import datetime
+
+    today_date = datetime.date.today()
+    placeHolderURL = "http://i.ebayimg.com/00/s/MTQ4OFg5NTQ=/z/DdQAAMXQeW5Tbuyw/$_57.JPG"
+
+    cardInstanceSales = CardInstanceSales.objects.get_or_create(ebayNumber=ItemID, otherURL=placeHolderURL, saleDate=today_date, saleAmount="100.0", evidenceImageURL=placeHolderURL)[0]
+    cardInstanceSales.save()
+    cardInstanceSales.cardInstance.add(CardInstance)
+    return cardInstanceSales
+
+def addCardInstanceMedia(CardInstance, imageURL):
+    cardInstanceMedia = CardInstanceMedia.objects.get_or_create(imageURL=imageURL)[0]
+    cardInstanceMedia.save()
+    cardInstanceMedia.cardInstance.add(CardInstance)
+    return cardInstanceMedia
+
+def addCardInstance(Card, ItemID):
+    import json
+    from ebay.shopping import GetSingleItem
+    cardInstance = CardInstance.objects.get_or_create(card=Card, serialNumber=1)[0]
+    cardInstance.save()
+
+    result = json.loads(GetSingleItem(ItemID))
+    pprint.pprint(result)
+
+    item = result['Item']
+    title = result['Item']['Title']
+    pictures = result['Item']['PictureURL']
+
+    for picture in pictures:
+        addCardInstanceMedia(cardInstance, picture)
+        addCardInstanceMedia(cardInstance, stripPictureURL(picture))
+
+    addEbaySaleInstance(cardInstance, ItemID)
+
+    return cardInstance
+
+def tryFindingCard(Card, keywordSearch):
+    from EbayPython import downloadItemGallery, getCompletedItems
+
+    completedItems = getCompletedItems(keywordSearch)
+
+    for completeItem in completedItems:
+       for searchResult in completeItem['searchResult']:
+            count = searchResult['@count']
+            numberOfItems = int(count)
+            print("Number of items: " + count )
+
+            if(numberOfItems > 0):
+                items = searchResult['item']
+                logging.info(pprint.pformat(items))
+                
+                if(numberOfItems > 0):
+                    logging.info("Multiple items:" + count )
+                    for item in items:
+                        ebayItemId ="".join(item['itemId'])
+                        addCardInstance(Card, ebayItemId)
+                else:
+                    #single item
+                    logging.info("Single item:" + count )
+                    ebayItemId ="".join(item['itemId'])
+                    addCardInstance(Card, ebayItemId)  
+            else:
+                print "No items for search " + keywordSearch
+                logging.info("No items:" + count )  
+
+def addStarRubies():
+
+
+    
+    import pprint
+    import urllib
+    import pyimgur
+    import re
+
+    from ebay.finding import (getSearchKeywordsRecommendation, findItemsByKeywords, 
+                          findItemsByCategory, findItemsAdvanced, 
+                          findItemsByProduct, findItemsIneBayStores, 
+                          findCompletedItems, getHistograms)
+
+    YearSet = Set.objects.filter(year='1997-98')
+    print YearSet
+    rubiesSet = YearSet.filter(name__contains='Star Rubies')[0]
+    print rubiesSet
+
+    cards = Card.objects.filter(set=rubiesSet)
+    print cards
+
+    for card in cards:
+        print card
+        ebaySearch = card.playerNames() + " (1997, 97, 98, 1998) (Star Rubies)"
+        tryFindingCard(card, ebaySearch)
+
 
 # Start execution here!
 if __name__ == '__main__':
@@ -215,8 +317,8 @@ if __name__ == '__main__':
     
     print "Starting Rango population script..."
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tango_with_django_project.settings')
-    from rango.models import Category, Page, Team, Sport, Player, Set, Card
-    populate_cards()
-    populate_cards_from_pickle()
-    
+    from rango.models import Category, Page, Team, Sport, Player, Set, Card, CardInstance, CardInstanceMedia, CardInstanceSales
+    #populate_cards()
+    #populate_cards_from_pickle()
+    addStarRubies()
     

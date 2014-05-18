@@ -317,7 +317,7 @@ if __name__ == '__main__':
     print "Starting Rango population script..."
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tango_with_django_project.settings')
     from rango.models import Category, Page, Team, Sport, Player, Set, Card, CardInstance, CardInstanceMedia, CardInstanceSales
-    populate_cards()
-    populate_cards_from_pickle()
+    #populate_cards()
+    #populate_cards_from_pickle()
     addStarRubies()
     

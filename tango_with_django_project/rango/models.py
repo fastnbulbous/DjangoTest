@@ -96,7 +96,7 @@ class CardInstanceMedia(models.Model):
     imageURL = models.URLField()
 
     def __unicode__(self):
-        return str(self.imageURL) 
+        return str(self.cardInstance) 
 
 class CardInstanceSales(models.Model):
     cardInstance = models.ForeignKey(CardInstance)
@@ -107,5 +107,5 @@ class CardInstanceSales(models.Model):
     evidenceImageURL = models.URLField()
 
     def __unicode__(self):
-        return " - " + str(self.ebayNumber)
+        return str(self.cardInstance) + " - " + str(self.ebayNumber)
     
